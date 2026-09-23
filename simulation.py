@@ -1,11 +1,10 @@
-# simulation.py
-
 import json
 import os
 from datetime import datetime
 
-from dotenv import load_dotenv
-from openai import OpenAI
+# from dotenv import load_dotenv
+# from openai import OpenAI
+from ollama import Client
 
 from agents import Agent
 from config import (
@@ -228,61 +227,50 @@ def print_summary(
 
 def main():
 
-    load_dotenv()
+    # load_dotenv()
 
-    api_key = os.getenv("OPENAI_API_KEY")
+    # api_key = os.getenv("OPENAI_API_KEY")
 
-    if not api_key:
-        raise ValueError(
-            "OPENAI_API_KEY was not found. "
-            "Make sure it is set in your .env file."
-        )
+    # if not api_key:
+    #     raise ValueError(
+    #         "OPENAI_API_KEY was not found. "
+    #         "Make sure it is set in your .env file."
+    #     )
 
-    client = OpenAI(api_key=api_key)
+    # client = OpenAI(api_key=api_key)
+
+    client = Client(
+        host="http://localhost:11434"
+    )
 
     agents = create_agents(client)
 
-    # --------------------------------------------------------
     # Phase 1
-    # --------------------------------------------------------
-
     initial_responses = run_initial_phase(
         agents
     )
 
-    # --------------------------------------------------------
     # Phase 2
-    # --------------------------------------------------------
-
     discussion_history = run_discussion_phase(
         agents,
         initial_responses,
     )
 
-    # --------------------------------------------------------
     # Phase 3
-    # --------------------------------------------------------
-
     final_responses = run_final_phase(
         agents,
         initial_responses,
         discussion_history,
     )
 
-    # --------------------------------------------------------
     # Save
-    # --------------------------------------------------------
-
     filename = save_results(
         initial_responses,
         discussion_history,
         final_responses,
     )
 
-    # --------------------------------------------------------
     # Summary
-    # --------------------------------------------------------
-
     print_summary(
         initial_responses,
         final_responses,

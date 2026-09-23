@@ -1,24 +1,32 @@
-# agents.py
-
-from openai import OpenAI
-
+# from openai import OpenAI
+from ollama import Client
 from config import MODEL, PERSONAS
 
 
 class Agent:
-    def __init__(self, name: str, client: OpenAI):
+    def __init__(self, name: str, client: Client):
         self.name = name
         self.persona = PERSONAS[name]
         self.client = client
 
     def _call(self, instructions: str, prompt: str) -> str:
-        response = self.client.responses.create(
+        response = self.client.chat(
             model=MODEL,
-            instructions=instructions,
-            input=prompt,
+            messages=[
+                {
+                    "role": "system",
+                    "content": instructions,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            # instructions=instructions,
+            # input=prompt,
         )
 
-        return response.output_text.strip()
+        return response["message"]["content"].strip()
 
     def initial_response(self, question: str) -> str:
         """
@@ -189,16 +197,13 @@ You have access to:
 
 Now provide your FINAL answer to the original question.
 
-Your final answer should reflect your current reasoning after participating in
-the discussion.
+Your final answer should only be YES or NO. 
 
 IMPORTANT:
 - You are allowed to keep your original position.
 - You are allowed to change your original position.
-- Do not change your position merely because another agent disagreed.
-- Base your answer on the arguments you consider most convincing.
-- Your response must begin with exactly YES or NO.
-- After YES or NO, provide a concise explanation.
+- Your response must be exactly YES or NO.
+- Do not include any additional words. 
 """
 
         prompt = f"""

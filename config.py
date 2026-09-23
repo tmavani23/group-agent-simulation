@@ -1,9 +1,7 @@
-# config.py
-
-MODEL = "gpt-5.6"
+MODEL = "llama3:latest"
 
 QUESTION = """
-Should universities require students to use AI detection software?
+Should rich people be taxed more?
 """.strip()
 
 
